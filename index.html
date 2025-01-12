@@ -41,9 +41,10 @@
       playerCount++;
       const playerDiv = document.createElement('div');
       playerDiv.classList.add('player');
+      const playerName = `Gracz ${playerCount}`;
       playerDiv.innerHTML = `
         <img src="images/default-avatar.png" alt="Avatar" class="avatar">
-        <span class="player-name">Gracz ${playerCount}</span>
+        <span class="player-name" onclick="editPlayerName(this)">${playerName}</span>
         <span class="player-points">0</span>
         <button class="btn-minus">-</button>
         <button class="btn-plus">+</button>
@@ -62,6 +63,29 @@
         pointsSpan.textContent = parseInt(pointsSpan.textContent) + 1;
       });
     });
+
+    // Funkcja edytująca nick gracza
+    function editPlayerName(element) {
+      const currentName = element.textContent;
+      const input = document.createElement('input');
+      input.type = 'text';
+      input.value = currentName;
+      input.className = 'player-name-input';
+      input.addEventListener('blur', () => {
+        const newName = input.value.trim() || currentName; // Jeśli pole będzie puste, pozostaje stara nazwa
+        element.textContent = newName;
+        element.style.display = 'inline';
+        input.remove();
+      });
+      input.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+          input.blur();
+        }
+      });
+      element.style.display = 'none';
+      element.parentElement.insertBefore(input, element);
+      input.focus();
+    }
 
     // Wczytywanie dźwięków
     fetch('sounds')
