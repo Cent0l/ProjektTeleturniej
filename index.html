@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="language" content="pl">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Teleturniej</title>
+  <link rel="stylesheet" href="css/style.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+</head>
+<body>
+  <header>
+    <h1>Teleturniej</h1>
+  </header>
+  <main>
+    <section id="players">
+      <h2>Gracze</h2>
+      <div id="player-list"></div>
+      <button id="add-player">Dodaj gracza</button>
+    </section>
+    
+    <section id="sounds">
+      <h2>Odtwarzacz dźwięków</h2>
+      <select id="sound-select"></select>
+      <button id="play-sound">Odtwórz</button>
+      <audio id="audio-player" controls></audio>
+    </section>
+  </main>
+  
+  <script>
+    const playerList = document.getElementById('player-list');
+    const addPlayerButton = document.getElementById('add-player');
+    const soundSelect = document.getElementById('sound-select');
+    const playSoundButton = document.getElementById('play-sound');
+    const audioPlayer = document.getElementById('audio-player');
+
+    let playerCount = 0;
+
+    // Dodawanie gracza
+    addPlayerButton.addEventListener('click', () => {
+      playerCount++;
+      const playerDiv = document.createElement('div');
+      playerDiv.classList.add('player');
+      playerDiv.innerHTML = `
+        <img src="images/default-avatar.png" alt="Avatar" class="avatar">
+        <span class="player-name">Gracz ${playerCount}</span>
+        <span class="player-points">0</span>
+        <button class="btn-minus">-</button>
+        <button class="btn-plus">+</button>
+      `;
+      playerList.appendChild(playerDiv);
+
+      const minusButton = playerDiv.querySelector('.btn-minus');
+      const plusButton = playerDiv.querySelector('.btn-plus');
+      const pointsSpan = playerDiv.querySelector('.player-points');
+
+      minusButton.addEventListener('click', () => {
+        pointsSpan.textContent = parseInt(pointsSpan.textContent) - 1;
+      });
+
+      plusButton.addEventListener('click', () => {
+        pointsSpan.textContent = parseInt(pointsSpan.textContent) + 1;
+      });
+    });
+
+    // Wczytywanie dźwięków
+    fetch('sounds')
+      .then(() => {
+        const soundFiles = ['sound1.mp3', 'sound2.mp3', 'sound3.mp3']; // Wstaw swoje pliki
+        soundFiles.forEach(file => {
+          const option = document.createElement('option');
+          option.value = `sounds/${file}`;
+          option.textContent = file;
+          soundSelect.appendChild(option);
+        });
+      });
+
+    // Odtwarzanie dźwięku
+    playSoundButton.addEventListener('click', () => {
+      const selectedSound = soundSelect.value;
+      audioPlayer.src = selectedSound;
+      audioPlayer.play();
+    });
+  </script>
+</body>
+</html>
