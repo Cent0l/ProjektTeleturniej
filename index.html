@@ -42,10 +42,20 @@
     const audioPlayer = document.getElementById('audio-player');
 
     let players = JSON.parse(localStorage.getItem('players')) || [];
+    let avatars = [];
+
+    // Pobieranie listy avatarów z avatars.json
+    fetch('avatars.json')
+      .then(response => response.json())
+      .then(data => {
+        avatars = data;
+      })
+      .catch(error => console.error('Błąd podczas ładowania avatarów:', error));
 
     function addPlayer(name = `Gracz ${players.length + 1}`, points = 0) {
       const playerId = `player-${Date.now()}`;
-      const player = { id: playerId, name, points };
+      const playerAvatar = avatars.length > players.length ? avatars[players.length] : null;
+      const player = { id: playerId, name, points, avatar: playerAvatar };
       players.push(player);
       renderPlayer(player);
       savePlayers();
@@ -55,14 +65,26 @@
       const playerDiv = document.createElement('div');
       playerDiv.classList.add('player');
       playerDiv.id = player.id;
+
+      const avatarDiv = document.createElement('div');
+      avatarDiv.classList.add('player-box');
+
+      if (player.avatar) {
+        avatarDiv.style.backgroundImage = `url('${player.avatar}')`;
+        avatarDiv.style.backgroundSize = 'cover';
+      } else {
+        avatarDiv.style.backgroundColor = 'black';
+      }
+
       playerDiv.innerHTML = `
-        <div class="player-box"></div>
         <span class="player-name" onclick="editPlayerName('${player.id}')">${player.name}</span>
         <span class="player-points" id="points-${player.id}">${player.points}</span>
         <button class="btn-minus" onclick="updateScore('${player.id}', -1)">-</button>
         <button class="btn-plus" onclick="updateScore('${player.id}', 1)">+</button>
         <button class="btn-remove" onclick="removePlayer('${player.id}')">Usuń</button>
       `;
+
+      playerDiv.prepend(avatarDiv);
       playerList.appendChild(playerDiv);
     }
 
@@ -120,13 +142,11 @@
       audioPlayer.play();
     });
 
-    // Funkcja do szybkiego odtwarzania dźwięków z przycisków
     function playQuickSound(soundPath) {
       audioPlayer.src = soundPath;
       audioPlayer.play();
     }
 
-    // Pobieranie listy dźwięków z sounds.json
     fetch('sounds.json')
       .then(response => response.json())
       .then(soundFiles => {

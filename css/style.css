@@ -40,6 +40,16 @@ main {
   margin: 0 1rem;
 }
 
+.player-box {
+  width: 70px;
+  height: 70px;
+  background-color: black;
+  margin-right: 1rem;
+  border-radius: 5px;
+  background-size: cover;
+  background-position: center;
+}
+
 #quick-buttons {
   margin-top: 1rem;
 }
