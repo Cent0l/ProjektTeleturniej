@@ -12,6 +12,7 @@
   <header>
     <h1>Teleturniej</h1>
   </header>
+  
   <main>
     <section id="players">
       <h2>Gracze</h2>
@@ -21,37 +22,46 @@
     
     <section id="sounds">
       <h2>Odtwarzacz dźwięków</h2>
+      
+      <!-- Tabela z dynamicznymi przyciskami dźwięków -->
+      <table id="sound-table"></table>
+
+      <!-- Ręczna wybieraczka dźwięków -->
       <select id="sound-select"></select>
       <button id="play-sound">Odtwórz</button>
       <audio id="audio-player" controls></audio>
-
-      <!-- Przyciski do szybkiego odtwarzania dźwięków -->
-      <div id="quick-buttons">
-        <button onclick="playQuickSound('sounds/correct.mp3')">Correct</button>
-        <button onclick="playQuickSound('sounds/wrong.mp3')">Wrong</button>
-        <button onclick="playQuickSound('sounds/yay.mp3')">Yay</button>
+	  <br><br>
+	  <div id="quick-buttons">
+        <button_c onclick="playQuickSound('sounds/correct.mp3')">Correct</button_c>
+        <button_w onclick="playQuickSound('sounds/wrong.mp3')">Wrong</button_w>
+        <button_y onclick="playQuickSound('sounds/yay.mp3')">Yay</button_y>
        
       </div>
     </section>
   </main>
-  
-  <script>
-    const playerList = document.getElementById('player-list');
-    const addPlayerButton = document.getElementById('add-player');
-    const soundSelect = document.getElementById('sound-select');
-    const playSoundButton = document.getElementById('play-sound');
-    const audioPlayer = document.getElementById('audio-player');
 
-    let players = JSON.parse(localStorage.getItem('players')) || [];
+  <footer>
+    <p>Teleturniej Toczkensa. Created by SiemkaMati</p>
+  </footer>
+
+  <script>
+    const playerList = document.getElementById("player-list");
+    const addPlayerButton = document.getElementById("add-player");
+    const soundTable = document.getElementById("sound-table");
+    const soundSelect = document.getElementById("sound-select");
+    const playSoundButton = document.getElementById("play-sound");
+    const audioPlayer = document.getElementById("audio-player");
+
+    let players = JSON.parse(localStorage.getItem("players")) || [];
     let avatars = [];
 
     // Pobieranie listy avatarów z avatars.json
-    fetch('avatars.json')
+    fetch("avatars.json")
       .then(response => response.json())
       .then(data => {
         avatars = data;
       })
-      .catch(error => console.error('Błąd podczas ładowania avatarów:', error));
+      .catch(error => console.error("Błąd podczas ładowania avatarów:", error));
 
     function addPlayer(name = `Gracz ${players.length + 1}`, points = 0) {
       const playerId = `player-${Date.now()}`;
@@ -63,18 +73,17 @@
     }
 
     function renderPlayer(player) {
-      const playerDiv = document.createElement('div');
-      playerDiv.classList.add('player');
+      const playerDiv = document.createElement("div");
+      playerDiv.classList.add("player");
       playerDiv.id = player.id;
 
-      const avatarDiv = document.createElement('div');
-      avatarDiv.classList.add('player-box');
+      const avatarDiv = document.createElement("div");
+      avatarDiv.classList.add("player-avatar");
 
       if (player.avatar) {
         avatarDiv.style.backgroundImage = `url('${player.avatar}')`;
-        avatarDiv.style.backgroundSize = 'cover';
       } else {
-        avatarDiv.style.backgroundColor = 'black';
+        avatarDiv.style.backgroundColor = "gray";
       }
 
       playerDiv.innerHTML = `
@@ -99,30 +108,21 @@
     function editPlayerName(playerId) {
       const player = players.find(p => p.id === playerId);
       const playerNameSpan = document.querySelector(`#${playerId} .player-name`);
-      const input = document.createElement('input');
-      input.type = 'text';
+      const input = document.createElement("input");
+      input.type = "text";
       input.value = player.name;
-      input.className = 'player-name-input';
-      input.addEventListener('blur', () => {
+      input.addEventListener("blur", () => {
         player.name = input.value.trim() || player.name;
         playerNameSpan.textContent = player.name;
         input.remove();
-        playerNameSpan.style.display = 'inline';
         savePlayers();
       });
-      input.addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') {
-          input.blur();
-        }
-      });
-      playerNameSpan.style.display = 'none';
-      playerNameSpan.parentElement.insertBefore(input, playerNameSpan);
+      playerNameSpan.replaceWith(input);
       input.focus();
     }
 
     function removePlayer(playerId) {
-      const confirmDelete = confirm('Czy na pewno chcesz usunąć tego gracza?');
-      if (confirmDelete) {
+      if (confirm("Czy na pewno chcesz usunąć tego gracza?")) {
         players = players.filter(p => p.id !== playerId);
         document.getElementById(playerId).remove();
         savePlayers();
@@ -130,16 +130,60 @@
     }
 
     function savePlayers() {
-      localStorage.setItem('players', JSON.stringify(players));
+      localStorage.setItem("players", JSON.stringify(players));
     }
 
     function loadPlayers() {
       players.forEach(renderPlayer);
     }
 
-    playSoundButton.addEventListener('click', () => {
-      const selectedSound = soundSelect.value;
-      audioPlayer.src = selectedSound;
+    fetch("sounds.json")
+      .then(response => response.json())
+      .then(soundFiles => {
+        const soundGroups = {};
+
+        soundFiles.forEach(file => {
+          const match = file.match(/^(\d)/);
+          if (match) {
+            const group = match[1];
+            if (!soundGroups[group]) {
+              soundGroups[group] = [];
+            }
+            soundGroups[group].push(file);
+          }
+        });
+
+        const maxRows = Math.max(...Object.values(soundGroups).map(arr => arr.length));
+
+        for (let row = 0; row < maxRows; row++) {
+          const tr = document.createElement("tr");
+
+          Object.keys(soundGroups).sort().forEach(group => {
+            const td = document.createElement("td");
+            if (soundGroups[group][row]) {
+              const file = soundGroups[group][row];
+              const button = document.createElement("button");
+              button.textContent = file.replace(/^\d+_/, "").replace(".mp3", "");
+              button.onclick = () => playQuickSound(`sounds/${file}`);
+              td.appendChild(button);
+            }
+            tr.appendChild(td);
+          });
+
+          soundTable.appendChild(tr);
+        }
+
+        soundFiles.forEach(file => {
+          const option = document.createElement("option");
+          option.value = `sounds/${file}`;
+          option.textContent = file;
+          soundSelect.appendChild(option);
+        });
+      })
+      .catch(error => console.error("Błąd podczas ładowania dźwięków:", error));
+
+    playSoundButton.addEventListener("click", () => {
+      audioPlayer.src = soundSelect.value;
       audioPlayer.play();
     });
 
@@ -148,24 +192,8 @@
       audioPlayer.play();
     }
 
-    fetch('sounds.json')
-      .then(response => response.json())
-      .then(soundFiles => {
-        soundFiles.forEach(file => {
-          const option = document.createElement('option');
-          option.value = `sounds/${file}`;
-          option.textContent = file;
-          soundSelect.appendChild(option);
-        });
-      })
-      .catch(error => console.error('Błąd podczas ładowania dźwięków:', error));
-
-    addPlayerButton.addEventListener('click', () => addPlayer());
+    addPlayerButton.addEventListener("click", () => addPlayer());
     loadPlayers();
   </script>
-  
-  <footer>
-    <p>Teleturniej Toczkensa. Created by SiemkaMati</p>
-  </footer>
 </body>
 </html>

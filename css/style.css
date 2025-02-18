@@ -1,4 +1,4 @@
-/* Resetowanie domyślnych marginesów i ustawienie pełnej wysokości */
+
 html, body {
   height: 100%;
   margin: 0;
@@ -7,26 +7,26 @@ html, body {
   background-color: #ad1ce6;
   display: flex;
   flex-direction: column;
+  overflow-x: hidden;
 }
 
-/* Nagłówek */
 header {
   background-color: #333;
   color: white;
   text-align: center;
-  padding: 1rem;
+  padding: 0.1rem;
 }
 
-/* Główna zawartość - elastyczny kontener */
 main {
+  max-width: 100%;
   flex: 1;
   display: flex;
   justify-content: space-around;
   flex-wrap: wrap;
-  margin: 2rem;
+  margin: 1rem;
 }
 
-/* Sekcje dla graczy i odtwarzacza */
+/* Sekcje */
 #players, #sounds {
   background-color: #b584c3;
   padding: 1rem;
@@ -36,89 +36,108 @@ main {
   min-width: 300px;
 }
 
-/* Styl gracza */
+/* Lista graczy */
 .player {
   display: flex;
   align-items: center;
-  margin: 1rem 0;
+  margin: 0.5rem 0;
   padding: 1rem;
   background: #e0e0e0;
   border-radius: 5px;
 }
 
-/* Nazwa gracza */
+.player-avatar {
+  width: 100px;
+  height: 100px;
+  background-size: cover;
+  background-position: center;
+  margin-right: 10px;
+  border: 2px solid #333;
+}
+
 .player-name {
   flex: 1;
   font-weight: bold;
   cursor: pointer;
 }
 
-/* Punkty gracza */
 .player-points {
   font-weight: bold;
-  margin: 0 1rem;
+  margin: 0 0.5rem;
 }
 
-/* Czarny kwadrat zamiast avatara */
-.player-box {
-  width: 70px;
-  height: 70px;
-  background-color: black;
-  margin-right: 1rem;
-  border-radius: 5px;
-  background-size: cover;
-  background-position: center;
-}
-
-/* Kontener dla szybkich przycisków */
-#quick-buttons {
-  margin-top: 1rem;
-  display: flex;
-  gap: 10px;
-  justify-content: center;
-}
-
-/* Styl dla szybkich przycisków dźwięków */
-#quick-buttons button {
-  padding: 0.5rem 1rem;
+button {
+  padding: 0.5rem;
   border: none;
+  background: #007bff;
+  margin: 0 0.5rem;
+  color: white;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+button_c {
+  width: 100%;
+  padding: 0.7rem;
   background: #28a745;
   color: white;
   border-radius: 5px;
-  cursor: pointer;
 }
 
-#quick-buttons button:hover {
+button_w {
+  width: 100%;
+  padding: 0.7rem;
+  background: #FF0000;
+  color: white;
+  border-radius: 5px;
+  margin: 1rem;
+}
+
+button_y {
+  width: 100%;
+  padding: 0.7rem;
+  background: #8F00FF;
+  color: white;
+  border-radius: 5px;
+}
+
+	
+button:hover {
+  background: #0056b3;
+  padding: 0.5rem;
+}
+
+/* Tabela dźwięków */
+#sound-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+#sound-table td {
+  padding: 5px;
+  text-align: center;
+  border: none;
+  background: transparent;
+}
+
+#sound-table button {
+  width: 100%;
+  padding: 0.5rem;
+  background: #28a745;
+  color: white;
+  border-radius: 5px;
+}
+
+#sound-table button:hover {
   background: #218838;
 }
 
-/* Styl dla zwykłych przycisków */
-button {
-  padding: 0.5rem;
-  margin: 0.3rem;
-  border: none;
-  background: #007bff;
-  color: white;
-  border-radius: 5px;
-  cursor: pointer;
-}
 
-button:hover {
-  background: #0056b3;
-}
-
-/* Styl dla odtwarzacza dźwięków */
-audio {
-  margin-top: 1rem;
-  width: 100%;
-}
-
-/* Stopka zawsze na dole */
 footer {
   background-color: #333;
   color: white;
   text-align: center;
-  padding: 1rem;
+  padding: 0.1rem;
   margin-top: auto;
   width: 100%;
 }
