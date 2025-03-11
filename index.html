@@ -27,16 +27,20 @@
       <table id="sound-table"></table>
 
       <!-- Ręczna wybieraczka dźwięków -->
+	  <br>
+	  <center>
       <select id="sound-select"></select>
       <button id="play-sound">Odtwórz</button>
-      <audio id="audio-player" controls></audio>
 	  <br><br>
+      <audio id="audio-player" controls></audio>
+	  <br><br><br>
 	  <div id="quick-buttons">
-        <button_c onclick="playQuickSound('sounds/correct.mp3')">Correct</button_c>
-        <button_w onclick="playQuickSound('sounds/wrong.mp3')">Wrong</button_w>
-        <button_y onclick="playQuickSound('sounds/yay.mp3')">Yay</button_y>
-       
+        <button-correct onclick="playQuickSound('sounds/correct.mp3')">Correct</button-correct>
+        <button-wrong onclick="playQuickSound('sounds/wrong.mp3')">Wrong</button-wrong>
+        <button-yay onclick="playQuickSound('sounds/yay.mp3')">Yay</button-yay>
+        <button-applouse onclick="playQuickSound('sounds/applause.mp3')">Brawa</button-applouse>
       </div>
+	  </center>
     </section>
   </main>
 
@@ -106,20 +110,31 @@
     }
 
     function editPlayerName(playerId) {
-      const player = players.find(p => p.id === playerId);
-      const playerNameSpan = document.querySelector(`#${playerId} .player-name`);
-      const input = document.createElement("input");
-      input.type = "text";
-      input.value = player.name;
-      input.addEventListener("blur", () => {
-        player.name = input.value.trim() || player.name;
-        playerNameSpan.textContent = player.name;
-        input.remove();
-        savePlayers();
-      });
-      playerNameSpan.replaceWith(input);
-      input.focus();
+  const player = players.find(p => p.id === playerId);
+  const playerNameSpan = document.querySelector(`#${playerId} .player-name`);
+  
+  const input = document.createElement("input");
+  input.type = "text";
+  input.value = player.name;
+  input.className = "player-name-input";
+
+  input.addEventListener("blur", () => {
+    player.name = input.value.trim() || player.name; // Zapisanie nowego nicku
+    playerNameSpan.textContent = player.name;
+    input.replaceWith(playerNameSpan);
+    savePlayers(); // Aktualizacja w localStorage
+  });
+
+  input.addEventListener("keypress", (e) => {
+    if (e.key === "Enter") {
+      input.blur(); // Zatwierdzenie zmiany po naciśnięciu Enter
     }
+  });
+
+  playerNameSpan.replaceWith(input);
+  input.focus();
+}
+
 
     function removePlayer(playerId) {
       if (confirm("Czy na pewno chcesz usunąć tego gracza?")) {

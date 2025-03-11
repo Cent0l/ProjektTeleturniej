@@ -11,10 +11,11 @@ html, body {
 }
 
 header {
-  background-color: #333;
+  background-color: #000;
   color: white;
   text-align: center;
   padding: 0.1rem;
+  font-size: 1rem;
 }
 
 main {
@@ -26,7 +27,7 @@ main {
   margin: 1rem;
 }
 
-/* Sekcje */
+
 #players, #sounds {
   background-color: #b584c3;
   padding: 1rem;
@@ -76,29 +77,44 @@ button {
   cursor: pointer;
 }
 
-button_c {
+button-correct {
   width: 100%;
   padding: 0.7rem;
   background: #28a745;
   color: white;
   border-radius: 5px;
+  margin: 1rem;
+  cursor: pointer;
 }
 
-button_w {
+button-wrong {
   width: 100%;
   padding: 0.7rem;
   background: #FF0000;
   color: white;
   border-radius: 5px;
   margin: 1rem;
+  cursor: pointer;
 }
 
-button_y {
+button-yay {
   width: 100%;
   padding: 0.7rem;
   background: #8F00FF;
   color: white;
   border-radius: 5px;
+  margin: 1rem;
+  cursor: pointer;
+}
+
+button-applouse {
+  width: 100%;
+  padding: 0.7rem;
+  background: #CB9A39;
+  color: white;
+  border-radius: 5px;
+  margin: 1rem;
+  cursor: pointer;
 }
 
 	
@@ -107,7 +123,7 @@ button:hover {
   padding: 0.5rem;
 }
 
-/* Tabela dźwięków */
+
 #sound-table {
   width: 100%;
   border-collapse: collapse;
@@ -134,10 +150,11 @@ button:hover {
 
 
 footer {
-  background-color: #333;
+  background-color: #000;
   color: white;
   text-align: center;
   padding: 0.1rem;
+  font-size: 0.9rem;
   margin-top: auto;
   width: 100%;
 }
