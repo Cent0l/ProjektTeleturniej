@@ -35,10 +35,10 @@
       <audio id="audio-player" controls></audio>
 	  <br><br><br>
 	  <div id="quick-buttons">
-        <button class="button-correct" onclick="playQuickSound('sounds/correct.mp3')">Correct</button>
-        <button class="button-wrong" onclick="playQuickSound('sounds/wrong.mp3')">Wrong</button>
-        <button class="button-yay" onclick="playQuickSound('sounds/yay.mp3')">Yay</button>
-        <button class="button-applause" onclick="playQuickSound('sounds/applause.mp3')">Brawa</button>
+        <button-correct onclick="playQuickSound('sounds/correct.mp3')">Correct</button-correct>
+        <button-wrong onclick="playQuickSound('sounds/wrong.mp3')">Wrong</button-wrong>
+        <button-yay onclick="playQuickSound('sounds/yay.mp3')">Yay</button-yay>
+        <button-applouse onclick="playQuickSound('sounds/applause.mp3')">Brawa</button-applouse>
       </div>
 	  </center>
     </section>
@@ -68,64 +68,69 @@
       .catch(error => console.error("Błąd podczas ładowania avatarów:", error));
 
     function addPlayer(name = `Gracz ${players.length + 1}`, points = 0) {
-      const playerId = `player-${Date.now()}`;
-      const playerAvatar = avatars.length > players.length ? avatars[players.length] : null;
-      const player = { id: playerId, name, points, avatar: playerAvatar, lifelines: [false, false, false] };
-      players.push(player);
-      renderPlayer(player);
+		const playerId = `player-${Date.now()}`;
+		const playerAvatar = avatars.length > players.length ? avatars[players.length] : null;
+		const player = { id: playerId, name, points, avatar: playerAvatar, lifelines: [false, false, false] };
+		players.push(player);
+		renderPlayer(player);
+		savePlayers();
+}
+
+
+function renderPlayer(player) {
+  const playerDiv = document.createElement("div");
+  playerDiv.classList.add("player");
+  playerDiv.id = player.id;
+
+  const avatarDiv = document.createElement("div");
+  avatarDiv.classList.add("player-avatar");
+
+  if (player.avatar) {
+    avatarDiv.style.backgroundImage = `url('${player.avatar}')`;
+  } else {
+    avatarDiv.style.backgroundColor = "gray";
+  }
+
+  // Tworzenie kontenera dla kół ratunkowych
+  const lifelinesDiv = document.createElement("div");
+  lifelinesDiv.classList.add("lifelines");
+
+  for (let i = 0; i < 3; i++) {
+    const lifeline = document.createElement("div");
+    lifeline.classList.add("lifeline");
+    lifeline.dataset.index = i;
+
+    // Sprawdzenie, czy checkmark jest aktywowany
+    if (player.lifelines && player.lifelines[i]) {
+      lifeline.classList.add("checked");
+      lifeline.textContent = "✔";
+    }
+
+    // Obsługa kliknięcia (włączenie/wyłączenie)
+    lifeline.addEventListener("click", () => {
+      const index = lifeline.dataset.index;
+      player.lifelines[index] = !player.lifelines[index];
+      lifeline.classList.toggle("checked");
+      lifeline.textContent = player.lifelines[index] ? "✔" : "";
       savePlayers();
-    }
+    });
 
-    function renderPlayer(player) {
-      const playerDiv = document.createElement("div");
-      playerDiv.classList.add("player");
-      playerDiv.id = player.id;
+    lifelinesDiv.appendChild(lifeline);
+  }
 
-      const avatarDiv = document.createElement("div");
-      avatarDiv.classList.add("player-avatar");
+  playerDiv.innerHTML = `
+    <span class="player-name" onclick="editPlayerName('${player.id}')">${player.name}</span>
+    <span class="player-points" id="points-${player.id}">${player.points}</span>
+    <button class="btn-minus" onclick="updateScore('${player.id}', -1)">-</button>
+    <button class="btn-plus" onclick="updateScore('${player.id}', 1)">+</button>
+    <button class="btn-remove" onclick="removePlayer('${player.id}')">Usuń</button>
+  `;
 
-      if (player.avatar) {
-        avatarDiv.style.backgroundImage = `url('${player.avatar}')`;
-      } else {
-        avatarDiv.style.backgroundColor = "gray";
-      }
+  playerDiv.prepend(avatarDiv);
+  playerDiv.appendChild(lifelinesDiv); // Dodanie kół ratunkowych
+  playerList.appendChild(playerDiv);
+}
 
-      const lifelinesDiv = document.createElement("div");
-      lifelinesDiv.classList.add("lifelines");
-
-      for (let i = 0; i < 3; i++) {
-        const lifeline = document.createElement("div");
-        lifeline.classList.add("lifeline");
-        lifeline.dataset.index = i;
-
-        if (player.lifelines && player.lifelines[i]) {
-          lifeline.classList.add("checked");
-          lifeline.textContent = "✔";
-        }
-
-        lifeline.addEventListener("click", () => {
-          const index = lifeline.dataset.index;
-          player.lifelines[index] = !player.lifelines[index];
-          lifeline.classList.toggle("checked");
-          lifeline.textContent = player.lifelines[index] ? "✔" : "";
-          savePlayers();
-        });
-
-        lifelinesDiv.appendChild(lifeline);
-      }
-
-      playerDiv.innerHTML = `
-        <span class="player-name" onclick="editPlayerName('${player.id}')">${player.name}</span>
-        <span class="player-points" id="points-${player.id}">${player.points}</span>
-        <button class="btn-minus" onclick="updateScore('${player.id}', -1)">-</button>
-        <button class="btn-plus" onclick="updateScore('${player.id}', 1)">+</button>
-        <button class="btn-remove" onclick="removePlayer('${player.id}')">Usuń</button>
-      `;
-
-      playerDiv.prepend(avatarDiv);
-      playerDiv.appendChild(lifelinesDiv);
-      playerList.appendChild(playerDiv);
-    }
 
     function updateScore(playerId, change) {
       const player = players.find(p => p.id === playerId);
@@ -135,30 +140,31 @@
     }
 
     function editPlayerName(playerId) {
-      const player = players.find(p => p.id === playerId);
-      const playerNameSpan = document.querySelector(`#${playerId} .player-name`);
+  const player = players.find(p => p.id === playerId);
+  const playerNameSpan = document.querySelector(`#${playerId} .player-name`);
+  
+  const input = document.createElement("input");
+  input.type = "text";
+  input.value = player.name;
+  input.className = "player-name-input";
 
-      const input = document.createElement("input");
-      input.type = "text";
-      input.value = player.name;
-      input.className = "player-name-input";
+  input.addEventListener("blur", () => {
+    player.name = input.value.trim() || player.name; // Zapisanie nowego nicku
+    playerNameSpan.textContent = player.name;
+    input.replaceWith(playerNameSpan);
+    savePlayers(); // Aktualizacja w localStorage
+  });
 
-      input.addEventListener("blur", () => {
-        player.name = input.value.trim() || player.name;
-        playerNameSpan.textContent = player.name;
-        input.replaceWith(playerNameSpan);
-        savePlayers();
-      });
-
-      input.addEventListener("keypress", (e) => {
-        if (e.key === "Enter") {
-          input.blur();
-        }
-      });
-
-      playerNameSpan.replaceWith(input);
-      input.focus();
+  input.addEventListener("keypress", (e) => {
+    if (e.key === "Enter") {
+      input.blur(); // Zatwierdzenie zmiany po naciśnięciu Enter
     }
+  });
+
+  playerNameSpan.replaceWith(input);
+  input.focus();
+}
+
 
     function removePlayer(playerId) {
       if (confirm("Czy na pewno chcesz usunąć tego gracza?")) {
@@ -211,6 +217,13 @@
 
           soundTable.appendChild(tr);
         }
+
+        soundFiles.forEach(file => {
+          const option = document.createElement("option");
+          option.value = `sounds/${file}`;
+          option.textContent = file;
+          soundSelect.appendChild(option);
+        });
       })
       .catch(error => console.error("Błąd podczas ładowania dźwięków:", error));
 
