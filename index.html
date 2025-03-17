@@ -35,10 +35,10 @@
       <audio id="audio-player" controls></audio>
 	  <br><br><br>
 	  <div id="quick-buttons">
-        <button-correct onclick="playQuickSound('sounds/correct.mp3')">Correct</button-correct>
-        <button-wrong onclick="playQuickSound('sounds/wrong.mp3')">Wrong</button-wrong>
-        <button-yay onclick="playQuickSound('sounds/yay.mp3')">Yay</button-yay>
-        <button-applouse onclick="playQuickSound('sounds/applause.mp3')">Brawa</button-applouse>
+        <button class="button-correct" onclick="playQuickSound('sounds/correct.mp3')">Correct</button>
+        <button class="button-wrong" onclick="playQuickSound('sounds/wrong.mp3')">Wrong</button>
+        <button class="button-yay" onclick="playQuickSound('sounds/yay.mp3')">Yay</button>
+        <button class="button-applause" onclick="playQuickSound('sounds/applause.mp3')">Brawa</button>
       </div>
 	  </center>
     </section>
@@ -70,7 +70,7 @@
     function addPlayer(name = `Gracz ${players.length + 1}`, points = 0) {
       const playerId = `player-${Date.now()}`;
       const playerAvatar = avatars.length > players.length ? avatars[players.length] : null;
-      const player = { id: playerId, name, points, avatar: playerAvatar };
+      const player = { id: playerId, name, points, avatar: playerAvatar, lifelines: [false, false, false] };
       players.push(player);
       renderPlayer(player);
       savePlayers();
@@ -90,6 +90,30 @@
         avatarDiv.style.backgroundColor = "gray";
       }
 
+      const lifelinesDiv = document.createElement("div");
+      lifelinesDiv.classList.add("lifelines");
+
+      for (let i = 0; i < 3; i++) {
+        const lifeline = document.createElement("div");
+        lifeline.classList.add("lifeline");
+        lifeline.dataset.index = i;
+
+        if (player.lifelines && player.lifelines[i]) {
+          lifeline.classList.add("checked");
+          lifeline.textContent = "✔";
+        }
+
+        lifeline.addEventListener("click", () => {
+          const index = lifeline.dataset.index;
+          player.lifelines[index] = !player.lifelines[index];
+          lifeline.classList.toggle("checked");
+          lifeline.textContent = player.lifelines[index] ? "✔" : "";
+          savePlayers();
+        });
+
+        lifelinesDiv.appendChild(lifeline);
+      }
+
       playerDiv.innerHTML = `
         <span class="player-name" onclick="editPlayerName('${player.id}')">${player.name}</span>
         <span class="player-points" id="points-${player.id}">${player.points}</span>
@@ -99,6 +123,7 @@
       `;
 
       playerDiv.prepend(avatarDiv);
+      playerDiv.appendChild(lifelinesDiv);
       playerList.appendChild(playerDiv);
     }
 
@@ -110,31 +135,30 @@
     }
 
     function editPlayerName(playerId) {
-  const player = players.find(p => p.id === playerId);
-  const playerNameSpan = document.querySelector(`#${playerId} .player-name`);
-  
-  const input = document.createElement("input");
-  input.type = "text";
-  input.value = player.name;
-  input.className = "player-name-input";
+      const player = players.find(p => p.id === playerId);
+      const playerNameSpan = document.querySelector(`#${playerId} .player-name`);
 
-  input.addEventListener("blur", () => {
-    player.name = input.value.trim() || player.name; // Zapisanie nowego nicku
-    playerNameSpan.textContent = player.name;
-    input.replaceWith(playerNameSpan);
-    savePlayers(); // Aktualizacja w localStorage
-  });
+      const input = document.createElement("input");
+      input.type = "text";
+      input.value = player.name;
+      input.className = "player-name-input";
 
-  input.addEventListener("keypress", (e) => {
-    if (e.key === "Enter") {
-      input.blur(); // Zatwierdzenie zmiany po naciśnięciu Enter
+      input.addEventListener("blur", () => {
+        player.name = input.value.trim() || player.name;
+        playerNameSpan.textContent = player.name;
+        input.replaceWith(playerNameSpan);
+        savePlayers();
+      });
+
+      input.addEventListener("keypress", (e) => {
+        if (e.key === "Enter") {
+          input.blur();
+        }
+      });
+
+      playerNameSpan.replaceWith(input);
+      input.focus();
     }
-  });
-
-  playerNameSpan.replaceWith(input);
-  input.focus();
-}
-
 
     function removePlayer(playerId) {
       if (confirm("Czy na pewno chcesz usunąć tego gracza?")) {
@@ -187,13 +211,6 @@
 
           soundTable.appendChild(tr);
         }
-
-        soundFiles.forEach(file => {
-          const option = document.createElement("option");
-          option.value = `sounds/${file}`;
-          option.textContent = file;
-          soundSelect.appendChild(option);
-        });
       })
       .catch(error => console.error("Błąd podczas ładowania dźwięków:", error));
 
