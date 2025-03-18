@@ -37,7 +37,6 @@ main {
   min-width: 300px;
 }
 
-/* Lista graczy */
 .player {
   display: flex;
   align-items: center;
