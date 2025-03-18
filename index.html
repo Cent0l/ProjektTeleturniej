@@ -23,10 +23,8 @@
     <section id="sounds">
       <h2>Odtwarzacz dźwięków</h2>
       
-      <!-- Tabela z dynamicznymi przyciskami dźwięków -->
       <table id="sound-table"></table>
 
-      <!-- Ręczna wybieraczka dźwięków -->
 	  <br>
 	  <center>
       <select id="sound-select"></select>
@@ -59,7 +57,6 @@
     let players = JSON.parse(localStorage.getItem("players")) || [];
     let avatars = [];
 
-    // Pobieranie listy avatarów z avatars.json
     fetch("avatars.json")
       .then(response => response.json())
       .then(data => {
@@ -91,7 +88,6 @@ function renderPlayer(player) {
     avatarDiv.style.backgroundColor = "gray";
   }
 
-  // Tworzenie kontenera dla kół ratunkowych
   const lifelinesDiv = document.createElement("div");
   lifelinesDiv.classList.add("lifelines");
 
@@ -100,13 +96,11 @@ function renderPlayer(player) {
     lifeline.classList.add("lifeline");
     lifeline.dataset.index = i;
 
-    // Sprawdzenie, czy checkmark jest aktywowany
     if (player.lifelines && player.lifelines[i]) {
       lifeline.classList.add("checked");
       lifeline.textContent = "✔";
     }
 
-    // Obsługa kliknięcia (włączenie/wyłączenie)
     lifeline.addEventListener("click", () => {
       const index = lifeline.dataset.index;
       player.lifelines[index] = !player.lifelines[index];
@@ -127,7 +121,7 @@ function renderPlayer(player) {
   `;
 
   playerDiv.prepend(avatarDiv);
-  playerDiv.appendChild(lifelinesDiv); // Dodanie kół ratunkowych
+  playerDiv.appendChild(lifelinesDiv); 
   playerList.appendChild(playerDiv);
 }
 
@@ -149,15 +143,15 @@ function renderPlayer(player) {
   input.className = "player-name-input";
 
   input.addEventListener("blur", () => {
-    player.name = input.value.trim() || player.name; // Zapisanie nowego nicku
+    player.name = input.value.trim() || player.name; 
     playerNameSpan.textContent = player.name;
     input.replaceWith(playerNameSpan);
-    savePlayers(); // Aktualizacja w localStorage
+    savePlayers(); 
   });
 
   input.addEventListener("keypress", (e) => {
     if (e.key === "Enter") {
-      input.blur(); // Zatwierdzenie zmiany po naciśnięciu Enter
+      input.blur(); 
     }
   });
 
